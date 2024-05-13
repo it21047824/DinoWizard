@@ -33,7 +33,11 @@ import com.google.ar.sceneform.ux.TransformableNode;
 
 import com.redstream.dinowizard.models.ModelCreator;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+        FragmentOnAttachListener,
+        BaseArFragment.OnTapArPlaneListener,
+        BaseArFragment.OnSessionConfigurationListener,
+        ArFragment.OnViewCreatedListener {
     private static final String TAG = "MAIN_ACTIVITY";
     private static final double MIN_OPENGL_VERSION = 3.0;
     private ArFragment arFragment;
@@ -98,10 +102,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
-        if (modelCreator.getTrex() == null) {
+        if (modelCreator.getDragonfly() == null) {
             Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        Toast.makeText(this, "Adding...", Toast.LENGTH_SHORT).show();
 
         // Create the Anchor.
         Anchor anchor = hitResult.createAnchor();

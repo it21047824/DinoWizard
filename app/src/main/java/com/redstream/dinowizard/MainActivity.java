@@ -32,6 +32,7 @@ import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
+import com.gorisse.thomas.sceneform.light.LightEstimationConfig;
 import com.redstream.dinowizard.models.ModelCreator;
 
 public class MainActivity extends AppCompatActivity implements
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onViewCreated(ArSceneView arSceneView) {
         arFragment.setOnViewCreatedListener(null);
-
+        arSceneView._lightEstimationConfig = LightEstimationConfig.SPECTACULAR;
         // Fine adjust the maximum frame rate
         arSceneView.setFrameRateFactor(SceneView.FrameRate.FULL);
     }

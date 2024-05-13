@@ -25,6 +25,7 @@ import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.SceneView;
 import com.google.ar.sceneform.Sceneform;
+import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements
         BaseArFragment.OnSessionConfigurationListener,
         ArFragment.OnViewCreatedListener {
     private static final String TAG = "MAIN_ACTIVITY";
+    private final float dragonflyScale = 0.05f;
     private static final double MIN_OPENGL_VERSION = 3.0;
     private ArFragment arFragment;
     private ModelCreator modelCreator;
@@ -107,11 +109,10 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
 
-        Toast.makeText(this, "Adding...", Toast.LENGTH_SHORT).show();
-
         // Create the Anchor.
         Anchor anchor = hitResult.createAnchor();
         AnchorNode anchorNode = new AnchorNode(anchor);
+        anchorNode.setLocalScale(new Vector3(dragonflyScale,dragonflyScale,dragonflyScale));
         anchorNode.setParent(arFragment.getArSceneView().getScene());
 
         // Create the transformable model and add it to the anchor.

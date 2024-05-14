@@ -41,11 +41,13 @@ public class MainActivity extends AppCompatActivity implements
         BaseArFragment.OnSessionConfigurationListener,
         ArFragment.OnViewCreatedListener {
     private static final String TAG = "MAIN_ACTIVITY";
-    private final float dragonflyScale = 0.05f;
+    private final float rexScale = 0.02f;
+    private final float raptorScale = 0.1f;
+    private final float dragonflyScale = 0.03f;
     private static final double MIN_OPENGL_VERSION = 3.0;
     private ArFragment arFragment;
     private ModelCreator modelCreator;
-    private Renderable testModel;
+    private int[] modelCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements
 
         modelCreator = new ModelCreator(this);
         modelCreator.initiateModels();
+
+        modelCount = new int[]{0,0,0};
 
         try {
             arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.arFragment);
@@ -110,18 +114,34 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
 
+        float scale;
+        ModelRenderable model;
+        if (modelCount[0] > modelCount[1]) {
+            model = modelCreator.getRaptor();
+            scale = raptorScale;
+            modelCount[1]++;
+        } else if (modelCount[1] > modelCount[2]) {
+            model = modelCreator.getDragonfly();
+            scale = dragonflyScale;
+            modelCount[2]++;
+        } else {
+            model = modelCreator.getTrex();
+            scale = rexScale;
+            modelCount[0]++;
+        }
+
         // Create the Anchor.
         Anchor anchor = hitResult.createAnchor();
         AnchorNode anchorNode = new AnchorNode(anchor);
-        anchorNode.setLocalScale(new Vector3(dragonflyScale,dragonflyScale,dragonflyScale));
+        anchorNode.setLocalScale(new Vector3(scale,scale,scale));
         anchorNode.setParent(arFragment.getArSceneView().getScene());
 
         // Create the transformable model and add it to the anchor.
-        TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
-        model.setParent(anchorNode);
-        model.setRenderable(modelCreator.getDragonfly())
+        TransformableNode modelNode = new TransformableNode(arFragment.getTransformationSystem());
+        modelNode.setParent(anchorNode);
+        modelNode.setRenderable(model)
                 .animate(true).start();
-        model.select();
+        modelNode.select();
     }
 
     public static boolean checkIsSupportedDeviceOrFinish(final Activity activity) {

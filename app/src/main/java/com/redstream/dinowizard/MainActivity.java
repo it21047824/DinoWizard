@@ -129,10 +129,7 @@ public class MainActivity extends AppCompatActivity implements FragmentOnAttachL
     }
 
     public void onTapPlaneImpl(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
-        if (modelCreator.getTrex() == null) {
-            Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show();
 
         float scale;
         ModelRenderable model;

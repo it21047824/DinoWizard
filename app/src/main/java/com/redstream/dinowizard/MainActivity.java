@@ -3,13 +3,13 @@ package com.redstream.dinowizard;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -27,7 +27,6 @@ import com.google.ar.sceneform.SceneView;
 import com.google.ar.sceneform.Sceneform;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
-import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
@@ -35,11 +34,7 @@ import com.google.ar.sceneform.ux.TransformableNode;
 import com.gorisse.thomas.sceneform.light.LightEstimationConfig;
 import com.redstream.dinowizard.models.ModelCreator;
 
-public class MainActivity extends AppCompatActivity implements
-        FragmentOnAttachListener,
-        BaseArFragment.OnTapArPlaneListener,
-        BaseArFragment.OnSessionConfigurationListener,
-        ArFragment.OnViewCreatedListener {
+public class MainActivity extends AppCompatActivity implements FragmentOnAttachListener {
     private static final String TAG = "MAIN_ACTIVITY";
     private final float rexScale = 0.02f;
     private final float raptorScale = 0.1f;
@@ -58,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
         setContentView(R.layout.activity_main);
-
         getSupportFragmentManager().addFragmentOnAttachListener(this);
 
         if (savedInstanceState == null) {
@@ -86,20 +80,18 @@ public class MainActivity extends AppCompatActivity implements
     public void onAttachFragment(@NonNull FragmentManager fragmentManager, @NonNull Fragment fragment) {
         if (fragment.getId() == R.id.arFragment) {
             arFragment = (ArFragment) fragment;
-            arFragment.setOnSessionConfigurationListener(this);
-            arFragment.setOnViewCreatedListener(this);
-            arFragment.setOnTapArPlaneListener(this);
+            arFragment.setOnTapArPlaneListener(this::onTapPlaneImpl);
+            arFragment.setOnSessionConfigurationListener(this::onSessionConfiguration);
+            arFragment.setOnViewCreatedListener(this::onViewCreated);
         }
     }
 
-    @Override
     public void onSessionConfiguration(Session session, Config config) {
         if (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
             config.setDepthMode(Config.DepthMode.AUTOMATIC);
         }
     }
 
-    @Override
     public void onViewCreated(ArSceneView arSceneView) {
         arFragment.setOnViewCreatedListener(null);
         arSceneView._lightEstimationConfig = LightEstimationConfig.SPECTACULAR;
@@ -107,9 +99,8 @@ public class MainActivity extends AppCompatActivity implements
         arSceneView.setFrameRateFactor(SceneView.FrameRate.FULL);
     }
 
-    @Override
-    public void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
-        if (modelCreator.getDragonfly() == null) {
+    public void onTapPlaneImpl(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
+        if (modelCreator.getTrex() == null) {
             Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show();
             return;
         }

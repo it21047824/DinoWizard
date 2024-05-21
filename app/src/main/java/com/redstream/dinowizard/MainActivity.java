@@ -9,13 +9,14 @@ import android.view.MotionEvent;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentOnAttachListener;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
+
+import com.google.android.material.slider.Slider;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Config;
 import com.google.ar.core.HitResult;
@@ -28,21 +29,26 @@ import com.google.ar.sceneform.Sceneform;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
-import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
 import com.gorisse.thomas.sceneform.light.LightEstimationConfig;
-import com.redstream.dinowizard.models.ModelCreator;
+import com.redstream.dinowizard.helpers.Item;
+import com.redstream.dinowizard.helpers.ModelCreator;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements FragmentOnAttachListener {
     private static final String TAG = "MAIN_ACTIVITY";
-    private final float rexScale = 0.02f;
-    private final float raptorScale = 0.1f;
-    private final float dragonflyScale = 0.03f;
     private static final double MIN_OPENGL_VERSION = 3.0;
     private ArFragment arFragment;
+    private Slider scaleSlider;
     private ModelCreator modelCreator;
+    private float raptorScale = 0.1f;
+    private float dragonflyScale = 0.03f;
+    private float rexScale = 0.02f;
     private int[] modelCount;
+    private float scaleAdjusterValue;
+    private ArrayList<Item> createdAnchorNodes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +73,11 @@ public class MainActivity extends AppCompatActivity implements FragmentOnAttachL
         modelCreator.initiateModels();
 
         modelCount = new int[]{0,0,0};
+        createdAnchorNodes = new ArrayList<>();
 
         try {
             arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.arFragment);
+            scaleSlider = findViewById(R.id.scaleSlider);
         } catch (Exception e) {
             Log.e(TAG, "Error");
         }
@@ -97,6 +105,26 @@ public class MainActivity extends AppCompatActivity implements FragmentOnAttachL
         arSceneView._lightEstimationConfig = LightEstimationConfig.SPECTACULAR;
         // Fine adjust the maximum frame rate
         arSceneView.setFrameRateFactor(SceneView.FrameRate.FULL);
+
+        scaleSlider.addOnChangeListener((slider, value, fromUser) -> {
+            scaleAdjusterValue = value;
+
+            for (Item item : createdAnchorNodes) {
+
+                float scale;
+                if (item.getDinoType() == Item.Type.RAPTOR) {
+                    scale = raptorScale;
+                } else if (item.getDinoType() == Item.Type.DRAGONFLY) {
+                    scale = dragonflyScale;
+                } else {
+                    scale = rexScale;
+                }
+
+                scale += value;
+
+                item.getAnchorNode().setLocalScale(new Vector3(scale, scale, scale));
+            }
+        });
     }
 
     public void onTapPlaneImpl(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
@@ -107,25 +135,33 @@ public class MainActivity extends AppCompatActivity implements FragmentOnAttachL
 
         float scale;
         ModelRenderable model;
+        Item.Type dinoType;
         if (modelCount[0] > modelCount[1]) {
+            dinoType = Item.Type.RAPTOR;
             model = modelCreator.getRaptor();
             scale = raptorScale;
             modelCount[1]++;
         } else if (modelCount[1] > modelCount[2]) {
+            dinoType = Item.Type.DRAGONFLY;
             model = modelCreator.getDragonfly();
             scale = dragonflyScale;
             modelCount[2]++;
         } else {
+            dinoType = Item.Type.REX;
             model = modelCreator.getTrex();
             scale = rexScale;
             modelCount[0]++;
         }
+
+        //adjust scale
+        scale += scaleAdjusterValue;
 
         // Create the Anchor.
         Anchor anchor = hitResult.createAnchor();
         AnchorNode anchorNode = new AnchorNode(anchor);
         anchorNode.setLocalScale(new Vector3(scale,scale,scale));
         anchorNode.setParent(arFragment.getArSceneView().getScene());
+        createdAnchorNodes.add(new Item(anchorNode, dinoType));
 
         // Create the transformable model and add it to the anchor.
         TransformableNode modelNode = new TransformableNode(arFragment.getTransformationSystem());

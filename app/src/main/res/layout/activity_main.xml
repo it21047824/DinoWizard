@@ -9,4 +9,30 @@
         android:id="@+id/arFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/white"
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="5dp"
+
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/adjust_scale"
+            android:paddingStart="20dp"
+            android:paddingEnd="5dp"
+            />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/scaleSlider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:value="0.0"
+            android:valueFrom="-0.2"
+            android:valueTo="0.5" />
+    </LinearLayout>
 </FrameLayout>

@@ -1,4 +1,4 @@
-package com.redstream.dinowizard.models;
+package com.redstream.dinowizard.helpers;
 
 import android.content.Context;
 import android.util.Log;

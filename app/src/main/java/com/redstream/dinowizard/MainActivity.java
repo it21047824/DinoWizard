@@ -1,5 +1,6 @@
 package com.redstream.dinowizard;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -43,9 +44,9 @@ public class MainActivity extends AppCompatActivity implements FragmentOnAttachL
     private ArFragment arFragment;
     private Slider scaleSlider;
     private ModelCreator modelCreator;
-    private float raptorScale = 0.1f;
-    private float dragonflyScale = 0.03f;
-    private float rexScale = 0.02f;
+    private final float raptorScale = 0.1f;
+    private final float dragonflyScale = 0.03f;
+    private final float rexScale = 0.02f;
     private int[] modelCount;
     private float scaleAdjusterValue;
     private ArrayList<Item> createdAnchorNodes;
@@ -171,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements FragmentOnAttachL
         modelNode.select();
     }
 
+    @SuppressLint("ObsoleteSdkInt")
     public static boolean checkIsSupportedDeviceOrFinish(final Activity activity) {
         if (Build.VERSION.SDK_INT < VERSION_CODES.N) {
             Log.e(TAG, "Sceneform requires Android N or later");
